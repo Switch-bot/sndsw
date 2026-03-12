@@ -24,7 +24,7 @@
 #include "sndDSVetoCut.h"
 
 // Alternatice sets of cuts.
-enum Cutset { stage1cuts, novetocuts, FVsideband, allowWalls2and5, stage1cutsVetoFirst, nueFilter} ;
+enum Cutset { stage1cuts, novetocuts, FVsideband, allowWalls2and5, stage1cutsVetoFirst, nueFilter, noVeto} ;
 
 int main(int argc, char ** argv) {
 
@@ -133,6 +133,15 @@ int main(int argc, char ** argv) {
     cutFlow.push_back( new snd::analysis_cuts::sciFiStationCut(0.05, std::vector<int>(1, 5), ch)); // D. Vertex not in 5th wall
     cutFlow.push_back( new snd::analysis_cuts::DSVetoCut(ch)); // D. Veto events with hits in last DS planes
     if (not isMC) cutFlow.push_back( new snd::analysis_cuts::eventDeltatCut(-1, 100, ch)); // J. Previous event more than 100 clock cycles away. To avoid deadtime issues.
+
+  } else if (selected_cutset == noVeto) {
+    cutFlow.push_back( new snd::analysis_cuts::avgSciFiFiducialCut(200, 1200, 300, 128*12-200, ch)); // E. Average SciFi hit channel number must be within [200, 1200] (ver) and [300, max-200] (hor)
+    cutFlow.push_back( new snd::analysis_cuts::avgDSFiducialCut(70, 105, 10, 50, ch)); // F. Average DS hit bar number must be within [70, 105] (ver) and [10, 50] (hor)
+    //cutFlow.push_back( new snd::analysis_cuts::vetoCut(ch)); // B. No veto hits
+    cutFlow.push_back( new snd::analysis_cuts::sciFiStationCut(0., std::vector<int>(1, 1), ch)); // C. No hits in first SciFi plane
+    cutFlow.push_back( new snd::analysis_cuts::DSActivityCut(ch)); // H. If there is a downstream hit, require hits in all upstream stations.    
+    if (not isMC) cutFlow.push_back( new snd::analysis_cuts::eventDeltatCut(-1, 100, ch)); // J. Previous event more than 100 clock cycles away. To avoid deadtime issues.
+
   } else {
     std::cout << "Unrecognized cutset. Exitting" << std::endl;
     exit(-1);
@@ -286,7 +295,7 @@ int main(int argc, char ** argv) {
 	  }
 	}
       if (MCTracks->GetEntries() == 0) { 
-	noMCTracksHistogram->Fill(1); // X
+	noMCTracksHistogram->Fill(1);
       } else {
 	  cut_by_cut_truth_histos[this_species][seq_cut+1][0]->Fill(((ShipMCTrack*) MCTracks->At(0))->GetEnergy()); // Enu
 	  if (this_species < 4) {

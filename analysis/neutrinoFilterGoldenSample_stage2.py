@@ -298,7 +298,7 @@ cuts.append(["Sum of min DOCA per station < {0} cm".format(sum_min_dca_cut), sum
 ################################################################################
 # At least 35 SciFi hits
 ################################################################################
-min_scifi_hits_cut = 35 #Default=35; \pm 5 or \pm 1
+min_scifi_hits_cut = 39 #Default=35; \pm 4 or \pm 1
 def min_scifi_hits(event) :
     n_hits = 0
     ret = False
@@ -324,7 +324,7 @@ cuts.append(["More than {0} SciFi hits".format(min_scifi_hits_cut), min_scifi_hi
 ################################################################################
 min_QDC_data = 600
 min_QDC_MC = 700 # Baseline is 700, used 600 for efficiency checking
-QDCfactor = 1 #default should be 1; SF 100 is 1/1.804, 180 is 1/2.646 and 300 is 1/2.701
+QDCfactor = 1 #default should be 1; SF 100 is 1/1.804, 180 is 1/2.646 and 300 is 1/2.701 1/5.823
 def min_US_QDC(event) :
     US_QDC = 0
     ret = False
@@ -451,6 +451,7 @@ with open("nu_candidates_summary.txt", "w") as output_nu_cand_summary :
     csv_writer = csv.writer(output_nu_cand_summary)
     csv_writer.writerow(header)
     for i_event, event in enumerate(ch) :
+        print(i_event)
         if i_event >= n_events :
             break
         n_cuts_passed = 0
